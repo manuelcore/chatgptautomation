@@ -49,8 +49,8 @@ const server = http.createServer((req, res) => {
             <body>
                 <p>`+ intrebaretxt + `</p>
                 <form action="/" method="post">
-                    <p>answer:</p><input type="text" name="raspunsurigpt" /><br />
-                    <p>email:</p><input type="text" name="email" /><br />
+                    <p>answer:</p><input type="text" name="raspunsurigpt" required/><br />
+                    <p>email:</p><input type="email" name="email" required/><br />
                     <button>Send</button>
                 </form>
             </body>
