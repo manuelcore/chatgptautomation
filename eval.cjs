@@ -16,7 +16,6 @@ var con = mysql.createConnection({
   database: "sys"
 });
 
-
 function generateEvaluation() {
   spawnedShell = require('child_process').spawn('C:\\Windows\\System32\\cmd.exe');
   //start cli
@@ -49,10 +48,10 @@ function generateEvaluation() {
           spawnedShell.stdout.on('data', d => {
             //console.log(d.toString());
             var regex = /\d+/g;
-            //test if numeric evaluation present
+            //test if numeric evaluation present - search for 2 numbers, ex 5 out of 10 and use the forst number
+            //as the answer is explaining the question it is longer the question. short answers are to be avoided!
 
             if (!d.toString().startsWith("?") && d.toString().length > q.length && (d.toString().match(regex) != null)) {
-              //console.log((d.toString().match(regex).length > 0) ? d.toString().match(regex)[0] : "not found!");
               //insert evaluation (if any) into the DB
 
               var sqlq = 'UPDATE `sys`.`chestionar` SET `grade` = ' + d.toString().match(regex)[0] + ' WHERE `idchestionar` = ' + idchestionar + ';';
