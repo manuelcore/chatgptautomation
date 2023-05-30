@@ -48,19 +48,30 @@ function generateEvaluation() {
           spawnedShell.stdout.on('data', d => {
             //console.log(d.toString());
             var regex = /\d+/g;
-            //test if numeric evaluation present - search for 2 numbers, ex 5 out of 10 and use the forst number
+            var percentageRegex = '\\d+(?:\\.\\d+)?%';
+            //test if numeric evaluation present - search for 2 numbers, ex 5 out of 10 and use the first number
+            //also test for percentage evaluation like 80% or 80.1%
             //as the answer is explaining the question it is longer the question. short answers are to be avoided!
+            //if the line starts with ? it is not the line we seek
 
-            if (!d.toString().startsWith("?") && d.toString().length > q.length && (d.toString().match(regex) != null)) {
-              //insert evaluation (if any) into the DB
+            // elimintate null, undefined,  NaN,  empty string (""), 0 or false for d and q
 
-              var sqlq = 'UPDATE `sys`.`chestionar` SET `grade` = ' + d.toString().match(regex)[0] + ' WHERE `idchestionar` = ' + idchestionar + ';';
-              //console.log(sqlq);
-              con.query(sqlq, function (err, res) {
-                if (err) throw err;
-                console.log("Inserted:");
-              });
-            }
+            if (d && q)
+              if (!d.toString().startsWith("?") && d.toString().length > q.length) {
+                var valueToInsert = "";
+                //we take percentage first, then number
+                if (d.toString().match(percentageRegex) != null) valueToInsert = d.toString().match(percentageRegex)[0].slice(0, -1);
+                else if (d.toString().match(regex) != null) valueToInsert = d.toString().match(regex)[0];
+
+                //insert evaluation (if any) into the DB
+
+                var sqlq = 'UPDATE `sys`.`chestionar` SET `grade` = ' + valueToInsert + ' WHERE `idchestionar` = ' + idchestionar + ';';
+                //console.log(sqlq);
+                con.query(sqlq, function (err, res) {
+                  if (err) throw err;
+                  console.log("Inserted:");
+                });
+              }
           });
         }, 2000);
 
